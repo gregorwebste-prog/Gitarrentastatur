@@ -1,0 +1,10 @@
+# Arduino build files
+build/
+*.elf
+*.bin
+*.hex
+*.map
+
+# IDE
+.vscode/
+*.code-workspace
