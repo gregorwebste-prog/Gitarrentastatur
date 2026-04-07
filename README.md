@@ -2,21 +2,63 @@
 
 ESP32-basierter MIDI-Controller in Form einer Gitarrentastatur mit LED-Feedback.
 
-## Hardware
+## Bauteile
 
-| Bauteil | Modell | Bemerkung |
+### ICs / Module
+| Bezeichnung | Modell | Bemerkung |
 |---|---|---|
-| Mikrocontroller | ESP32-S3-WROOM-1-N8R8 | WiFi + BLE, nativer USB |
-| I2C GPIO-Expander | MCP23017-E/SO | Adresse: 0x20, RS Best.-Nr.: 403-816 |
-| LEDs | SK6812 MINI-E | Adressierbare RGB-LEDs |
-| USB-Anschluss | TYPE-C-31-M-12 | USB-C |
+| Mikrocontroller | ESP32-S3-WROOM-1-N8R8 | WiFi + BLE 5, nativer USB, 8MB Flash, 8MB PSRAM |
+| I2C GPIO-Expander | MCP23017-E/SO | SOIC-28, I2C Adresse 0x20, RS Best.-Nr.: 403-816 |
+| Spannungsregler | AMS1117 | 3,3V LDO, 5V → 3,3V |
+| LEDs | SK6812 MINI-E | Adressierbare RGBW-LEDs (SMD) |
+
+### Stecker / Buchsen
+| Bezeichnung | Modell | Bemerkung |
+|---|---|---|
+| USB-C Buchse | TYPE-C-31-M-12 | USB-C, SMD |
+| Programmierstecker | CON_Prog | 4-polig (TX, RX, 3V3, EN) |
+| I2C Stecker | CON4 / J_I2C | 4-polig (SDA, SCK, 3V3, GND) |
+| I2C Stecker 2 | J_I2C_2 | 4-polig |
+| Erweiterungsstecker | CON3 | 3-polig |
+
+### Taster / Schalter
+| Bezeichnung | Anzahl | Bemerkung |
+|---|---|---|
+| T_EN Taster | 1 | Programmiermodus aktivieren |
+| T_RST Taster | 1 | Reset |
+| Rotary Encoder | 3 | Mit Druecktaster (encoder_1, encoder_2, encoder_3) |
+| Gitarren-Schalter | mehrere | Matrix ROW/COL direkt am ESP32 (6 Reihen × n Spalten) |
+
+### Widerstaende
+| Bezeichnung | Wert | Funktion |
+|---|---|---|
+| R1 | 10 kΩ | T_EN Pull-up |
+| R2 | 10 kΩ | I2C SCK Pull-up |
+| R3 | 10 kΩ | I2C SDA Pull-up |
+| R5 | 5,1 kΩ | USB-C CC1 |
+| R6 | 5,1 kΩ | USB-C CC2 |
+| R7 | 10 kΩ | T_RST Pull-up |
+| R11, R12 | 10 kΩ | Encoder 1 (A, B) |
+| R21, R22 | 10 kΩ | Encoder 2 (A, B) |
+| R31, R32 | 10 kΩ | Encoder 3 (A, B) |
+| R41 | 10 kΩ | MCP23017 RESET Pull-up |
+
+### Kondensatoren
+| Bezeichnung | Wert | Funktion |
+|---|---|---|
+| C1 | 10 µF | ESP32 Abblockkondensator |
+| C2 | 1 µF | T_EN Entstoerung |
+| C3, C4 | 10 µF | AMS1117 Ein-/Ausgangskondensatoren |
+| C8 | 10 µF | MCP23017 Abblockkondensator |
+| C11 – C40 | 30x 10 µF | Abblockkondensatoren (Versorgung) |
 
 ## Funktionsweise
 
-- 16 Tasten werden ueber den **MCP23017** (I2C, 0x20) eingelesen
-- Jede Taste steuert eine **SK6812 LED** an (visuelles Feedback)
+- Gitarren-Tasten sind als **ROW/COL-Matrix** direkt am ESP32 angeschlossen (6 Saiten × mehrere Bunde)
+- **MCP23017** (I2C, 0x20) liest die 3 **Rotary Encoder** ein (GPA/GPB)
+- **SK6812 LEDs** geben visuelles Feedback pro Taste
 - MIDI-Noten werden per **BLE MIDI** gesendet (z.B. an GarageBand, DAW)
-- Startton: **E2 (MIDI Note 40)** – tiefste offene Gitarrensaite
+- **AMS1117** wandelt die 5V (USB) auf 3,3V fuer ESP32 und MCP23017 um
 
 ## Benoettigte Libraries (Arduino IDE)
 
